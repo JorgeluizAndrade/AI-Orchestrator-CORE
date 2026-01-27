@@ -1,4 +1,4 @@
-package com.ia.orchestrator.infrastructure.rest;
+package com.ia.orchestrator.core;
 
 
 import org.springframework.web.bind.annotation.GetMapping;
