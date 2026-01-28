@@ -20,7 +20,23 @@ public class TextAnalysis {
     }
     
     
-    public TextAnalysis(Long id, String rawData, String normalizedText, 
+    
+    
+    public TextAnalysis(String rawData, String normalizedText, String analyzedData, Float confidence,
+			Sentiment sentiment, Category category) {
+		super();
+		this.rawData = rawData;
+		this.normalizedText = normalizedText;
+		this.analyzedData = analyzedData;
+		this.confidence = confidence;
+		this.sentiment = sentiment;
+		this.category = category;
+	}
+
+
+
+
+	public TextAnalysis(Long id, String rawData, String normalizedText, 
     		Float confidence, Category category, Sentiment sentiment, String analyzedData) {
  
     	if(rawData.isBlank() || rawData.trim() == "") {
@@ -49,6 +65,90 @@ public class TextAnalysis {
         this.category =  category;
         this.sentiment = sentiment;
     }
+
+
+    
+    
+	public Long getId() {
+		return id;
+	}
+
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+
+	public String getRawData() {
+		return rawData;
+	}
+
+
+	public void setRawData(String rawData) {
+		this.rawData = rawData;
+	}
+
+
+	public String getNormalizedText() {
+		return normalizedText;
+	}
+
+
+	public void setNormalizedText(String normalizedText) {
+		this.normalizedText = normalizedText;
+	}
+
+
+	public String getAnalyzedData() {
+		return analyzedData;
+	}
+
+
+	public void setAnalyzedData(String analyzedData) {
+		this.analyzedData = analyzedData;
+	}
+
+
+	public Float getConfidence() {
+		return confidence;
+	}
+
+
+	public void setConfidence(Float confidence) {
+		this.confidence = confidence;
+	}
+
+
+	public Sentiment getSentiment() {
+		return sentiment;
+	}
+
+
+	public void setSentiment(Sentiment sentiment) {
+		this.sentiment = sentiment;
+	}
+
+
+	public Category getCategory() {
+		return category;
+	}
+
+
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+
+
+	public Instant getCreaated_at() {
+		return creaated_at;
+	}
+
+
+	public void setCreaated_at(Instant creaated_at) {
+		this.creaated_at = creaated_at;
+	}
+    
+    
     
  
 }
