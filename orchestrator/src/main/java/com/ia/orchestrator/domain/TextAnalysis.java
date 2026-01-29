@@ -19,8 +19,7 @@ public class TextAnalysis {
     public TextAnalysis() {
     }
     
-    
-    
+   
     
     public TextAnalysis(String rawData, String normalizedText, String analyzedData, Float confidence,
 			Sentiment sentiment, Category category) {
@@ -36,6 +35,44 @@ public class TextAnalysis {
 
 
 
+    
+    private TextAnalysis(
+            String normalizedText,
+            String analyzedData,
+            Sentiment sentiment,
+            Category category
+        ) {
+            this.normalizedText = normalizedText;
+            this.analyzedData = analyzedData;
+            this.sentiment = sentiment;
+            this.category = category;
+        }
+    
+    
+    
+    
+    public static TextAnalysis create(
+            String normalizedText,
+            String analyzedData,
+            Sentiment sentiment,
+            Category category,
+            Float confidence
+        ) {
+            if (normalizedText == null || normalizedText.isBlank()) {
+                throw new IllegalArgumentException("Normalized text is required");
+            }
+            if (sentiment == null || category == null) {
+                throw new IllegalArgumentException("Sentiment and Category are required");
+            }
+            
+            if(confidence < 0.0 ||confidence > 1.0) {
+        		throw new IllegalArgumentException("Confidence not be less than 0.0 ot more then 1.0!");
+        	}
+            
+            return new TextAnalysis(normalizedText, analyzedData, sentiment, category);
+        }
+
+    
 	public TextAnalysis(Long id, String rawData, String normalizedText, 
     		Float confidence, Category category, Sentiment sentiment, String analyzedData) {
  
@@ -53,9 +90,7 @@ public class TextAnalysis {
     	}
     	
     	
-    	if(confidence < 0.0 ||confidence > 1.0) {
-    		throw new IllegalArgumentException("Confidence not be less than 0.0 ot more then 1.0!");
-    	}
+    	
     	
     	this.id = id;
         this.rawData = rawData;
