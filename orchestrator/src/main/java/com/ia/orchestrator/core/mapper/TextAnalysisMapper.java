@@ -1,9 +1,13 @@
 package com.ia.orchestrator.core.mapper;
 
+import org.springframework.stereotype.Component;
+
 import com.ia.orchestrator.core.dtos.TextAnalysisRequestDTO;
 import com.ia.orchestrator.core.dtos.TextAnalysisResponseDTO;
 import com.ia.orchestrator.domain.TextAnalysis;
 
+
+@Component
 public class TextAnalysisMapper implements ITextAnalysisMapper {
 
 	
