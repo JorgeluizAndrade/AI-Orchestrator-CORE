@@ -1,5 +1,7 @@
 package com.ia.orchestrator.application.impl;
 
+import java.util.Locale;
+
 import org.springframework.stereotype.Service;
 
 import com.ia.orchestrator.application.IProcessTextAnalysisUseCase;
@@ -39,8 +41,7 @@ public class ProcessTextAnalysisUseCase implements IProcessTextAnalysisUseCase {
 
 		}
 		
-		String normalizedText = raw.trim().toLowerCase();
-		
+		String normalizedText = raw.trim().toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");		
 	
 
 		//  Sentiment, Category, Analyzed Data and Confidence
