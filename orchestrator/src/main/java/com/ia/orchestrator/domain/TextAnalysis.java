@@ -13,7 +13,7 @@ public class TextAnalysis {
     Float confidence;
     Sentiment sentiment;
     Category category;
-    Instant creaated_at;
+    Instant created_at;
 
 
     public TextAnalysis() {
@@ -74,7 +74,8 @@ public class TextAnalysis {
 
     
 	public TextAnalysis(Long id, String rawData, String normalizedText, 
-    		Float confidence, Category category, Sentiment sentiment, String analyzedData) {
+    		Float confidence, Category category, Sentiment sentiment, 
+    		String analyzedData, Instant create_at) {
  
     	if(rawData.isBlank() || rawData.trim() == "") {
     		throw new IllegalArgumentException("raw data not be empty or blanck!");
@@ -99,6 +100,7 @@ public class TextAnalysis {
         this.confidence = confidence;
         this.category =  category;
         this.sentiment = sentiment;
+        this.created_at = create_at;
     }
 
 
@@ -175,12 +177,12 @@ public class TextAnalysis {
 
 
 	public Instant getCreaated_at() {
-		return creaated_at;
+		return created_at;
 	}
 
 
-	public void setCreaated_at(Instant creaated_at) {
-		this.creaated_at = creaated_at;
+	public void setCreaated_at(Instant created_at) {
+		this.created_at = created_at;
 	}
     
     
