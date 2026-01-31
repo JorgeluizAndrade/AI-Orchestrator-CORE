@@ -18,10 +18,7 @@ public class ProcessTextAnalysisUseCase implements IProcessTextAnalysisUseCase {
 
 	private final IAi ai;
 	private final ITextAnalysisMapper analysisMapper;
-    private final ITextAnalysisRepository repository;
-
-
-	
+	private final ITextAnalysisRepository repository;
 
 	public ProcessTextAnalysisUseCase(IAi ai, ITextAnalysisMapper analysisMapper, ITextAnalysisRepository repository) {
 		// TODO Auto-generated constructor stub
@@ -32,38 +29,28 @@ public class ProcessTextAnalysisUseCase implements IProcessTextAnalysisUseCase {
 	}
 
 	@Override
-	public TextAnalysisResponseDTO processAnalysis(TextAnalysisRequestDTO analysisRequestDTO) {
-		
-		String raw = analysisRequestDTO.rawData();
-				
+	public TextAnalysisResponseDTO processAnalysis(String raw) {
+
 		if (raw != null && !raw.isBlank()) {
-    		throw new IllegalArgumentException("raw data not be empty or blanck!");
+			throw new IllegalArgumentException("raw data not be empty or blanck!");
 
 		}
-		
-		String normalizedText = raw.trim().toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");		
-	
 
-		//  Sentiment, Category, Analyzed Data and Confidence
+		String normalizedText = raw.trim().toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");
+
+		// Sentiment, Category, Analyzed Data and Confidence
 		AiResponseDTO aiResponse = ai.aiClient(normalizedText);
-		
-		
+
 		String analyzedData = aiResponse.analyzedData();
 		Float confidence = aiResponse.confidence();
 
-		
-		
-		
-		TextAnalysis analysis = TextAnalysis.create(normalizedText, analyzedData, 
-				aiResponse.sentiment(), aiResponse.category(), confidence);
-		
-		
+		TextAnalysis analysis = TextAnalysis.create(normalizedText, analyzedData, aiResponse.sentiment(),
+				aiResponse.category(), confidence);
+
 		TextAnalysis persisted = repository.save(analysis);
-		
-		
+
 		return analysisMapper.toResponse(persisted);
 
 	}
-	
 
 }
