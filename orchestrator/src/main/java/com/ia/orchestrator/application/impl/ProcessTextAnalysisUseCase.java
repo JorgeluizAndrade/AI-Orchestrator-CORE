@@ -14,6 +14,9 @@ import com.ia.orchestrator.domain.repositories.ITextAnalysisRepository;
 import com.ia.orchestrator.infrastructure.ai.IAi;
 import com.ia.orchestrator.infrastructure.dto.AiResponseDTO;
 
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+
 @Service
 public class ProcessTextAnalysisUseCase implements IProcessTextAnalysisUseCase {
 
@@ -31,16 +34,29 @@ public class ProcessTextAnalysisUseCase implements IProcessTextAnalysisUseCase {
 
 	@Override
 	public TextAnalysisResponseDTO processAnalysis(String rawText) {
+		
+		System.out.println("RWAWWWW: "  +  rawText);
 
 		if (rawText == null || rawText.isBlank()) {
 			throw new IllegalArgumentException("raw data not be empty or blanck!");
 		}
 
-//		String normalizedText = Normalizer.normalize(rawText, Normalizer.Form.NFD);
-//		Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-//		normalizedText = pattern.matcher(normalizedText).replaceAll("");
+	
+		JsonNode node = new ObjectMapper().readTree(rawText);
 
-		String normalizedText = rawText.trim().toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");
+		String rawTextString = node.get("rawText").asString();
+		
+		System.out.println("CLEAN RWAWWWW: " + rawTextString);
+		
+		String normalizedText = rawTextString
+			    .toLowerCase(Locale.ROOT)
+			    .replace("’", "'")                 // aspas tipográficas
+			    .replaceAll("[^a-z0-9\\s']", " ")  // remove pontuação
+			    .replaceAll("\\s+", " ")           // colapsa espaços
+			    .trim();
+
+		
+		
 
 		// Sentiment, Category, Analyzed Data and Confidence
 		AiResponseDTO aiResponse = ai.aiClient(normalizedText);
