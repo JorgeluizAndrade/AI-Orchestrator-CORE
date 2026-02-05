@@ -1,5 +1,7 @@
 package com.ia.orchestrator.core.cognitive;
 
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +19,9 @@ public class CognitiveController {
 		this.processTextAnalysisUseCase = processTextAnalysisUseCase;
 	}
 
-	public TextAnalysisResponseDTO analysis(String rawText) {
+	
+	@PostMapping
+	public TextAnalysisResponseDTO analysis(@RequestBody String rawText) {
 		return this.processTextAnalysisUseCase.processAnalysis(rawText);
 	}
 
