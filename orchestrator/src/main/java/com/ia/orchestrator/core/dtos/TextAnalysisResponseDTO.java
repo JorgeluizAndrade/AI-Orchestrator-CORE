@@ -11,7 +11,7 @@ public record TextAnalysisResponseDTO(
         String rawData,
         String normalizedText,
         String analyzedData,
-        Float confidence,
+        float confidence,
         Sentiment sentiment,
         Category category,
         Instant createdAt

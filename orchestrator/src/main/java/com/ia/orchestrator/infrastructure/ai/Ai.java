@@ -2,68 +2,97 @@ package com.ia.orchestrator.infrastructure.ai;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Component;
-
-import com.ia.orchestrator.core.dtos.AiResponseDTO;
-
+import com.ia.orchestrator.infrastructure.dto.AiResponseDTO;
 
 @Component
 public class Ai implements IAi {
-	
-	private final String prompt = "Você é um sistema de interpretação semântica determinística.\n"
-			+ "Não seja criativo. Não adicione informações que não estejam implícitas no texto.\n"
-			+ "Não explique suas decisões.\n"
-			+ "\n"
-			+ "Tarefa:\n"
-			+ "Analise o texto fornecido e retorne APENAS um objeto JSON válido,\n"
-			+ "seguindo exatamente a estrutura definida abaixo.\n"
-			+ "\n"
-			+ "Regras obrigatórias:\n"
-			+ "- Não inclua texto fora do JSON.\n"
-			+ "- Não inclua comentários.\n"
-			+ "- Não inclua markdown.\n"
-			+ "- Não invente categorias ou sentimentos.\n"
-			+ "- Se houver ambiguidade, escolha NEUTRAL e reduza o confidence.\n"
-			+ "- confidence deve ser um número entre 0.0 e 1.0.\n"
-			+ "- normalizedText deve tornar explícito o significado implícito do texto, sem adicionar fatos.\n"
-			+ "\n"
-			+ "Sentiment permitido:\n"
-			+ "- POSITIVE\n"
-			+ "- NEUTRAL\n"
-			+ "- NEGATIVE\n"
-			+ "\n"
-			+ "Category permitida:\n"
-			+ "- PRODUCT\n"
-			+ "- SERVICE\n"
-			+ "- SUPPORT\n"
-			+ "- OTHER\n"
-			+ "\n"
-			+ "Estrutura EXATA do retorno:\n"
-			+ "\n"
-			+ "{\n"
-			+ "  \"rawData\": \"<texto original>\",\n"
-			+ "  \"normalizedText\": \"<interpretação semântica objetiva do texto>\",\n"
-			+ "  \"sentiment\": \"<POSITIVE | NEUTRAL | NEGATIVE>\",\n"
-			+ "  \"category\": \"<PRODUCT | SERVICE | SUPPORT | OTHER>\",\n"
-			+ "  \"confidence\": <número entre 0.0 e 1.0>\n"
-			+ "}\n"
-			+ ""; 
-	
-	private final ChatClient chatClient;
-	
-	public Ai(ChatClient.Builder chatClientBuilder) {
-		// TODO Auto-generated constructor stub
-		this.chatClient = chatClientBuilder.build();
-	}
 
+    private final ChatClient chatClient;
 
-	@Override
-	public  AiResponseDTO aiClient(String rawText) {		
-		return this.chatClient.prompt(prompt)
-	            .user(rawText)
-	            .call()
-	            .entity(AiResponseDTO.class);
-		
+    private static final String SYSTEM_PROMPT = """
+        You are a sentiment analysis assistant. Analyze the given text and return a JSON response.
+        
+        Categories: PRODUCT, SERVICE, SUPPORT, OTHER
+        Sentiments: POSITIVE, NEUTRAL, NEGATIVE
+        
+        Rules:
+        - analyzedData: objective semantic analysis in English
+        - category: must be exactly one of: PRODUCT, SERVICE, SUPPORT, OTHER
+        - sentiment: must be exactly one of: POSITIVE, NEUTRAL, NEGATIVE
+        - confidence: a number between 0.0 and 1.0
+        
+        CRITICAL: Return ONLY valid JSON without markdown code blocks, backticks, or explanations.
+        """;
 
-	}
+    private static final String USER_PROMPT_TEMPLATE = """
+        Analyze this customer feedback: "%s"
+        
+        Return ONLY this exact JSON structure (no ```json, no markdown):
+        {
+          "analyzedData": "your analysis here",
+          "category": "PRODUCT",
+          "sentiment": "NEUTRAL",
+          "confidence": 0.85
+        }
+        """;
 
+    public Ai(ChatClient.Builder chatClientBuilder) {
+        this.chatClient = chatClientBuilder.build();
+    }
+
+    @Override
+    public AiResponseDTO aiClient(String rawText) {
+        try {
+            String userPrompt = String.format(USER_PROMPT_TEMPLATE, 
+                rawText.replace("\"", "\\\""));
+            
+            System.out.println("Sending to AI...");
+            System.out.println("Prompt: " + userPrompt);
+
+            AiResponseDTO res = this.chatClient
+                .prompt()
+                .system(SYSTEM_PROMPT)
+                .user(userPrompt)
+                .call()
+                .entity(AiResponseDTO.class);
+
+            if (res == null) {
+                throw new IllegalStateException("AI returned null response");
+            }
+
+            // Validações
+            validateResponse(res);
+
+            System.out.println("RESPONSE IA: " + res);
+            System.out.println("Confidence: " + res.confidence());
+            System.out.println("Sentiment: " + res.sentiment());
+            System.out.println("Category: " + res.category());
+
+            return res;
+
+        } catch (Exception e) {
+            System.err.println("Error calling IA: " + e.getMessage());
+            e.printStackTrace();
+            throw new IllegalStateException("AI response could not be parsed: " + e.getMessage(), e);
+        }
+    }
+
+    private void validateResponse(AiResponseDTO res) {
+        if (res.analyzedData() == null || res.analyzedData().isBlank()) {
+            throw new IllegalStateException("analyzedData is missing");
+        }
+        
+//        if (res.category() == null || 
+//            !java.util.List.of("PRODUCT", "SERVICE", "SUPPORT", "OTHER").contains(res.category())) {
+//            throw new IllegalStateException("Invalid category: " + res.category());
+//        }
+//        if (res.sentiment() == null || 
+//            !java.util.List.of("POSITIVE", "NEUTRAL", "NEGATIVE").contains(res.sentiment())) {
+//            throw new IllegalStateException("Invalid sentiment: " + res.sentiment());
+//        }
+        
+        if (res.confidence() < 0.0 || res.confidence() > 1.0) {
+            throw new IllegalStateException("Invalid confidence: " + res.confidence());
+        }
+    }
 }

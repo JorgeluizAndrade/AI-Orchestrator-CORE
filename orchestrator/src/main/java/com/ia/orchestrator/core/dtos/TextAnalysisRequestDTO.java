@@ -7,7 +7,7 @@ public record TextAnalysisRequestDTO(
         String rawData,
         String normalizedText,
         String analyzedData,
-        Float confidence,
+        float confidence,
         Category category,
         Sentiment sentiment
 ) {}

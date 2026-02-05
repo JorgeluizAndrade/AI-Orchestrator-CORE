@@ -2,6 +2,10 @@ package com.ia.orchestrator.infrastructure.database.jpa;
 
 import java.time.Instant;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.ia.orchestrator.domain.objects.Category;
 import com.ia.orchestrator.domain.objects.Sentiment;
 
@@ -15,7 +19,7 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@Entity(name = "text_analysis")
+@Entity(name = "TextAnalysis")
 @AllArgsConstructor
 @Data
 public class TextAnalysisEntity {
@@ -44,7 +48,8 @@ public class TextAnalysisEntity {
 	    Category category;
 	    
 	    
-	    @Column(name = "created_at")
+	    @Column(name = "created_at", nullable = false, updatable = false)
+	    @CreationTimestamp
 	    Instant created_at;
 	
 	
