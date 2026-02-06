@@ -3,6 +3,10 @@ package com.ia.orchestrator.infrastructure.ai;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Component;
 import com.ia.orchestrator.infrastructure.dto.AiResponseDTO;
+import com.ia.orchestrator.domain.objects.Category;
+import com.ia.orchestrator.domain.objects.Sentiment;
+
+
 
 @Component
 public class Ai implements IAi {
@@ -80,18 +84,21 @@ public class Ai implements IAi {
     }
 
     private void validateResponse(AiResponseDTO res) {
+    	Category cat = res.category();
+    	Sentiment sentiment = res.sentiment();
+    	
         if (res.analyzedData() == null || res.analyzedData().isBlank()) {
             throw new IllegalStateException("analyzedData is missing");
         }
         
-//        if (res.category() == null || 
-//            !java.util.List.of("PRODUCT", "SERVICE", "SUPPORT", "OTHER").contains(res.category())) {
-//            throw new IllegalStateException("Invalid category: " + res.category());
-//        }
-//        if (res.sentiment() == null || 
-//            !java.util.List.of("POSITIVE", "NEUTRAL", "NEGATIVE").contains(res.sentiment())) {
-//            throw new IllegalStateException("Invalid sentiment: " + res.sentiment());
-//        }
+        if (cat == null || 
+            !java.util.EnumSet.of(Category.PRODUCT, Category.SERVICE, Category.SUPPORT, Category.OTHER).contains(cat)) {
+            throw new IllegalStateException("Invalid category: " + cat);
+        }
+        if (sentiment == null || 
+            !java.util.EnumSet.of(Sentiment.POSITIVE, Sentiment.NEUTRAL, Sentiment.NEGATIVE).contains(sentiment)) {
+            throw new IllegalStateException("Invalid sentiment: " + sentiment);
+        }
         
         if (res.confidence() < 0.0 || res.confidence() > 1.0) {
             throw new IllegalStateException("Invalid confidence: " + res.confidence());
