@@ -12,8 +12,8 @@ public class Ai implements IAi {
     private static final String SYSTEM_PROMPT = """
         You are a sentiment analysis assistant. Analyze the given text and return a JSON response.
         
-        Categories: PRODUCT, SERVICE, SUPPORT, OTHER
-        Sentiments: POSITIVE, NEUTRAL, NEGATIVE
+        Category: PRODUCT, SERVICE, SUPPORT, OTHER
+        Sentiment: POSITIVE, NEUTRAL, NEGATIVE
         
         Rules:
         - analyzedData: objective semantic analysis in English
@@ -55,6 +55,8 @@ public class Ai implements IAi {
                 .user(userPrompt)
                 .call()
                 .entity(AiResponseDTO.class);
+            
+            System.out.println("RESRERSRESRE: " + res);
 
             if (res == null) {
                 throw new IllegalStateException("AI returned null response");
