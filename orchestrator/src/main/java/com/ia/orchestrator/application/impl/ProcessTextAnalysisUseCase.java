@@ -1,8 +1,6 @@
 package com.ia.orchestrator.application.impl;
 
-import java.text.Normalizer;
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
 
