@@ -1,11 +1,20 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+import argparse
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--asin", required=True)
+
+parser.add_argument("--url", required=True)
 
 
 
-asin_amazon = "B09G9H3RZH"
-url = f"https://www.amazon.in/dp/{asin_amazon}/"
+args = parser.parse_args()
+asin = args.asin
+url = args.url + asin
+
 
 
 HEADERS = ({'User-Agent':
@@ -34,7 +43,7 @@ for idx, text in enumerate(review_texts):
     review = {
         "id": idx + 1,
         "text": text,
-        "source": "amazon"
+        "source": "AMAZON"
     }
 
     reviews.append(review)
@@ -49,7 +58,7 @@ for i in soup.findAll("div",{'data-hook':"review-collapsed"}): # the tag which i
 
 
 payload = {
-    "product": asin_amazon,
+    "asin_product": asin,
     "reviews": reviews
 }
 
