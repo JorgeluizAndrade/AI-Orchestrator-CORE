@@ -1,19 +1,20 @@
 package com.ia.orchestrator.application.impl;
 
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.ia.orchestrator.application.IProcessTextAnalysisUseCase;
+import com.ia.orchestrator.application.IPythonScraperExecutor;
 import com.ia.orchestrator.core.dtos.TextAnalysisResponseDTO;
 import com.ia.orchestrator.core.mapper.ITextAnalysisMapper;
 import com.ia.orchestrator.domain.TextAnalysis;
 import com.ia.orchestrator.domain.repositories.ITextAnalysisRepository;
 import com.ia.orchestrator.infrastructure.ai.IAi;
 import com.ia.orchestrator.infrastructure.dto.AiResponseDTO;
+import com.ia.orchestrator.infrastructure.dto.ScrapingResponseDTO;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 
 @Service
 public class ProcessTextAnalysisUseCase implements IProcessTextAnalysisUseCase {
@@ -21,40 +22,35 @@ public class ProcessTextAnalysisUseCase implements IProcessTextAnalysisUseCase {
 	private final IAi ai;
 	private final ITextAnalysisMapper analysisMapper;
 	private final ITextAnalysisRepository repository;
+	private final IPythonScraperExecutor scraperExecutor;
 
-	public ProcessTextAnalysisUseCase(IAi ai, ITextAnalysisMapper analysisMapper, ITextAnalysisRepository repository) {
+	public ProcessTextAnalysisUseCase(IAi ai, ITextAnalysisMapper analysisMapper, ITextAnalysisRepository repository,
+			IPythonScraperExecutor scraperExecutor) {
 		// TODO Auto-generated constructor stub
 		this.ai = ai;
 		this.analysisMapper = analysisMapper;
 		this.repository = repository;
-		
+		this.scraperExecutor = scraperExecutor;
+
 	}
 
 	@Override
-	public TextAnalysisResponseDTO processAnalysis(String rawText) {
-		
-		System.out.println("RWAWWWW: "  +  rawText);
+	public TextAnalysisResponseDTO processAnalysis(String asin, String url) {
 
-		if (rawText == null || rawText.isBlank()) {
+		if (url == null || url.isBlank()) {
 			throw new IllegalArgumentException("raw data not be empty or blanck!");
 		}
 
-	
-		JsonNode node = new ObjectMapper().readTree(rawText);
+		ScrapingResponseDTO scraping = scraperExecutor.run(asin, url);
 
-		String rawTextString = node.get("rawText").asString();
-		
+		String rawTextString = scraping.getReviews().stream().map(r -> r.getText()).collect(Collectors.joining(" "));
+
 		System.out.println("CLEAN RWAWWWW: " + rawTextString);
-		
-		String normalizedText = rawTextString
-			    .toLowerCase(Locale.ROOT)
-			    .replace("’", "'")                 // aspas tipográficas
-			    .replaceAll("[^a-z0-9\\s']", " ")  // remove pontuação
-			    .replaceAll("\\s+", " ")           // colapsa espaços
-			    .trim();
 
-		
-		
+		String normalizedText = rawTextString.toLowerCase(Locale.ROOT).replace("’", "'") // aspas tipográficas
+				.replaceAll("[^a-z0-9\\s']", " ") // remove pontuação
+				.replaceAll("\\s+", " ") // colapsa espaços
+				.trim();
 
 		// Sentiment, Category, Analyzed Data and Confidence
 		AiResponseDTO aiResponse = ai.aiClient(normalizedText);
@@ -64,7 +60,7 @@ public class ProcessTextAnalysisUseCase implements IProcessTextAnalysisUseCase {
 
 		System.out.println("Confidence IA: " + confidence);
 
-		TextAnalysis analysis = TextAnalysis.create(rawText, normalizedText, analyzedData, aiResponse.sentiment(),
+		TextAnalysis analysis = TextAnalysis.create(rawTextString, normalizedText, analyzedData, aiResponse.sentiment(),
 				aiResponse.category(), confidence);
 
 		TextAnalysis persisted = repository.save(analysis);

@@ -55,10 +55,7 @@ for i in soup.findAll("div",{'data-hook':"review-collapsed"}): # the tag which i
                         replace('The media could not be loaded.','').lstrip(' '))
  
 
-
-
 payload = {
-    "asin_product": asin,
     "reviews": reviews
 }
 

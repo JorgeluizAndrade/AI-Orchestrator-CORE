@@ -5,6 +5,6 @@ import com.ia.orchestrator.core.dtos.TextAnalysisResponseDTO;
 import com.ia.orchestrator.domain.TextAnalysis;
 
 public interface ITextAnalysisMapper {
-    TextAnalysis toDomain(TextAnalysisRequestDTO data);
+//    TextAnalysis toDomain(TextAnalysisRequestDTO data);
     TextAnalysisResponseDTO toResponse(TextAnalysis entity);
 }

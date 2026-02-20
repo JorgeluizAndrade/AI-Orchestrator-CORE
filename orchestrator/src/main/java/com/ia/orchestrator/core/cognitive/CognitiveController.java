@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ia.orchestrator.application.IProcessTextAnalysisUseCase;
+import com.ia.orchestrator.core.dtos.TextAnalysisRequestDTO;
 import com.ia.orchestrator.core.dtos.TextAnalysisResponseDTO;
 
 @RestController
@@ -21,8 +22,8 @@ public class CognitiveController {
 
 	
 	@PostMapping
-	public TextAnalysisResponseDTO analysis(@RequestBody String rawText) {
-		return this.processTextAnalysisUseCase.processAnalysis(rawText);
+	public TextAnalysisResponseDTO analysis(@RequestBody TextAnalysisRequestDTO request) {
+		return this.processTextAnalysisUseCase.processAnalysis(request.asin(), request.url());
 	}
 
 }

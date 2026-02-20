@@ -11,19 +11,19 @@ import com.ia.orchestrator.domain.TextAnalysis;
 public class TextAnalysisMapper implements ITextAnalysisMapper {
 
 	
-	public TextAnalysis toDomain(TextAnalysisRequestDTO data) {
-		return new TextAnalysis(
-			    data.rawData(),
-			    data.normalizedText(),
-			    data.analyzedData(),
-			    data.confidence(),
-			    data.sentiment(),
-			    data.category()
-			);
-		
-	
-	}
-	
+//	public TextAnalysis toDomain(TextAnalysisRequestDTO data) {
+//		return new TextAnalysis(
+//			    data.rawData(),
+//			    data.normalizedText(),
+//			    data.analyzedData(),
+//			    data.confidence(),
+//			    data.sentiment(),
+//			    data.category()
+//			);
+//		
+//	
+//	}
+//	
 	
 	public TextAnalysisResponseDTO toResponse(TextAnalysis textAnalysis) {
 		return new TextAnalysisResponseDTO(
